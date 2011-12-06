@@ -4,8 +4,15 @@ Comment = require('./reddit/comment').Comment
 User = require('./reddit/user').User
 Vote = require('./reddit/vote').Vote
 
+# TODO: Add in support for error messages.
 class Reddit
   
+  @reddit: (subreddit = "", callback) ->
+    Request.get '/.json', null, (error, data) ->
+      if error? then console.warn error.message
+      if callback? then return callback data
+      return data
+
   @login: (username, password, callback) ->
     user = new User username, password
     content = user.requestString()
@@ -38,7 +45,14 @@ class Reddit
         if callback? then return callback userDetails
         return userDetails
 
-  @comment: (comment) ->
+  @comment: (comment, modhash, callback) ->
+    path = '/api/comment'
+    Request.post path, null, modhash, (error, response) ->
+      if error? then console.warn error.message
+      if response?
+        # redirect to comment?
+        if callback? then return callback response
+        return response
     # TODO: Comment post.
     # http://www.reddit.com/api/comment
 

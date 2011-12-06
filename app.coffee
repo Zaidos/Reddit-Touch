@@ -1,4 +1,6 @@
 Request     = require('./lib/request').Request
+Reddit      = require('./lib/reddit').Reddit
+MemoryStore = require('./node_modules/connect/lib/middleware/session/memory')
 connect     = require('connect')
 express     = require('express')
 
@@ -21,7 +23,11 @@ app.configure () ->
   app.use express.bodyParser()
   app.use express.methodOverride()
   app.use express.cookieParser()
-  app.use express.session { secret: 'zaidos',  cookie: { maxAge: 60000 } }
+  app.use express.session ({
+    key: 'touchit'
+    secret: 'touchitgood'
+    store: new MemoryStore({ reapInterval: 60000 * 10})
+  })
   app.use app.router
 
 # Settings
@@ -57,21 +63,25 @@ NotFound = (msg) ->
   Error.captureStackTrace this, arguments.callee
 
 app.all '/', (req, res) ->
-  req.session.views++
-  Request.get '/.json', null, (error, data) ->
-    res.render 'index', { posts: data }
+  user = req.session.user
+  Reddit.reddit "", (response) ->
+    res.render 'index', { posts: response, user: user }
 
 app.get '/r/:subreddit', (req, res) ->
+  user = req.session.user.name
   subreddit = req.params.subreddit
   path = "/r/#{subreddit}.json"
   Request.get path, null, (error, data) ->
-    res.render 'index', { posts: data }
+    res.render 'index', { posts: data, user: user }
 
 app.get '/login', (req, res) ->
-  res.render 'login', { layout: false}
+  res.render 'login', { layout: false }
 app.post '/login', (req, res) ->
-  #login user here.
-  res.send JSON.stringify req.body.user
+  userInfo = req.body.user
+  Reddit.login userInfo.name, userInfo.passwd, (user) ->
+    if user.isSignedIn?
+      req.session.user = user
+      res.redirect '/'
 
 # Error handling.
 app.get '/404', (req, res) ->

@@ -6,7 +6,8 @@ html ->
     title "#{@title or 'reddit touch'}"
     meta(name: 'description', content: @description) if @description?
     
-    link rel: 'stylesheet', href: 'http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css'
+    link type: 'text/css', rel: 'stylesheet', href: '/public/css/style.css'
+    link type: 'text/css', rel: 'stylesheet', href: 'http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css'
 
     script src: 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js'
     script src: 'http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js'
@@ -14,12 +15,19 @@ html ->
   body ->
     div 'data-role' : 'page', ->
       div 'data-role': 'header', ->
-        h1 'reddit touch'
         # Check is user is signed in
-        a href:'/login', 'data-rel':'dialog', -> 'Login'
-    
+        if @user?
+          a href:'/about', 'data-icon':'gear', -> @user.user
+        else
+          a href:'/login', 'data-rel':'dialog','data-theme':'b', -> 'Login'
+
+        h1 'reddit touch'
+
+        if @user?
+          a href:'/', 'data-icon':'plus', 'data-theme':'b', -> 'New'
+
       div 'data-role': 'content', ->
         @body
     
       div 'data-role' : 'footer', ->
-
+        h1 'reddit touch'
