@@ -1,7 +1,7 @@
 # Reddit Touch
-## reddit in node.js form
+### reddit in node.js form
 
-Reddit Touch is a NodeJS web application that introduces a mobile front-end interface for the popular site www.reddit.com
+Reddit Touch is a NodeJS web application that introduces a mobile front-end interface for the popular site [reddit](http://www.reddit.com)
 
 ## Usage
 
